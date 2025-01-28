@@ -81,7 +81,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let y = 0; y < gridSize; y++) {
                 for (let x = 0; x < gridSize; x++) {
-                    ctx.fillStyle = grid[y][x] === 1 ? '#000' : '#fff';
+                    ctx.fillStyle = grid[y][x] === 1 ? '#000' : '#fff'; // 1: 黒, 0: 白
                     ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
                 }
             }
