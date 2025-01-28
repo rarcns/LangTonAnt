@@ -42,6 +42,7 @@
         <button class="speed-btn" data-speed="10">x10</button>
         <button class="speed-btn" data-speed="50">x50</button>
         <button class="speed-btn" data-speed="100">x100</button>
+        <button class="speed-btn" data-speed="10000">x10000</button>
     </div>
     <canvas id="canvas"></canvas>
 
@@ -49,7 +50,7 @@
         // 定数
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        let gridSize = 100; // グリッドの数 (100x100)
+        let gridSize = 1000; // グリッドの数 (100x100)
         let cellSize;
         const stepCountDisplay = document.getElementById('step-count');
         let speed = 1; // 初期速度 (倍速モード)
