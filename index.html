@@ -9,6 +9,8 @@
             display: block;
             margin: 0 auto;
             border: 1px solid #000;
+            max-width: 100%;
+            height: auto;
         }
         body {
             text-align: center;
@@ -24,6 +26,9 @@
             margin: 10px;
             font-size: 18px;
         }
+        .speed-btns {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -31,21 +36,28 @@
     <button id="start-btn">開始</button>
     <button id="reset-btn">リセット</button>
     <div id="step-count">歩数: 0</div>
-    <canvas id="canvas" width="500" height="500"></canvas>
+    <div class="speed-btns">
+        <button class="speed-btn" data-speed="1">x1</button>
+        <button class="speed-btn" data-speed="2">x2</button>
+        <button class="speed-btn" data-speed="10">x10</button>
+        <button class="speed-btn" data-speed="50">x50</button>
+        <button class="speed-btn" data-speed="100">x100</button>
+    </div>
+    <canvas id="canvas"></canvas>
 
     <script>
         // 定数
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const gridSize = 100; // グリッドの数 (100x100)
-        const cellSize = canvas.width / gridSize; // 各セルのサイズ
+        let gridSize = 100; // グリッドの数 (100x100)
+        let cellSize;
         const stepCountDisplay = document.getElementById('step-count');
+        let speed = 1; // 初期速度 (倍速モード)
 
         // グリッドと蟻の初期設定
         let grid;
         let ant;
         let steps = 0; // 歩数をカウントする変数
-
         let running = false;
         let interval;
 
@@ -64,8 +76,8 @@
 
             // 蟻の初期位置と方向をランダム設定
             ant = {
-                x: Math.floor(Math.random() * gridSize), // ランダムなx座標
-                y: Math.floor(Math.random() * gridSize), // ランダムなy座標
+                x: Math.floor(gridSize / 2), // 蟻の位置を中央に設定
+                y: Math.floor(gridSize / 2),
                 dir: Math.floor(Math.random() * 4) // ランダムな方向 (0: 上, 1: 右, 2: 下, 3: 左)
             };
 
@@ -85,9 +97,11 @@
                     ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
                 }
             }
-            // 蟻を描画
+            // 蟻を描画 (常に中央に表示)
             ctx.fillStyle = 'red';
-            ctx.fillRect(ant.x * cellSize, ant.y * cellSize, cellSize, cellSize);
+            ctx.fillRect((ant.x - Math.floor(gridSize / 2)) * cellSize + canvas.width / 2, 
+                         (ant.y - Math.floor(gridSize / 2)) * cellSize + canvas.height / 2,
+                         cellSize, cellSize);
         }
 
         // 蟻を1ステップ動かす
@@ -125,7 +139,7 @@
                 interval = setInterval(() => {
                     moveAnt();
                     drawGrid();
-                }, 50);
+                }, 50 / speed);
                 running = true;
                 document.getElementById('start-btn').textContent = '停止';
             }
@@ -139,8 +153,27 @@
             initialize();
         });
 
+        // 倍速ボタンのイベント
+        document.querySelectorAll('.speed-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                speed = parseInt(btn.getAttribute('data-speed'), 10);
+            });
+        });
+
+        // キャンバスのリサイズ
+        function resizeCanvas() {
+            const width = window.innerWidth * 0.9; // 幅を画面幅の90%に設定
+            canvas.width = width;
+            canvas.height = width; // 幅に合わせて正方形に
+            gridSize = 100; // グリッドの数を固定
+            cellSize = canvas.width / gridSize; // 各セルのサイズを再計算
+            initialize(); // 初期化を再実行
+        }
+
         // 初期化
-        initialize();
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
     </script>
 </body>
 </html>
