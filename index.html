@@ -139,7 +139,7 @@
                 interval = setInterval(() => {
                     moveAnt();
                     drawGrid();
-                }, 50 / speed);
+                }, 50 / speed); // スピードに合わせて時間間隔を設定
                 running = true;
                 document.getElementById('start-btn').textContent = '停止';
             }
@@ -147,7 +147,7 @@
 
         // リセットボタンのイベント
         document.getElementById('reset-btn').addEventListener('click', () => {
-            clearInterval(interval);
+            clearInterval(interval); // 現在のインターバルをクリア
             running = false;
             document.getElementById('start-btn').textContent = '開始';
             initialize();
@@ -157,6 +157,13 @@
         document.querySelectorAll('.speed-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 speed = parseInt(btn.getAttribute('data-speed'), 10);
+                if (running) {
+                    clearInterval(interval); // 現在のインターバルをクリア
+                    interval = setInterval(() => {
+                        moveAnt();
+                        drawGrid();
+                    }, 50 / speed); // スピードに合わせて時間間隔を更新
+                }
             });
         });
 
