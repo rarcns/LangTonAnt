@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ラングトンの蟻</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #000;
+        }
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>ラングトンの蟻</h1>
+    <button id="start-btn">開始</button>
+    <button id="reset-btn">リセット</button>
+    <canvas id="canvas" width="500" height="500"></canvas>
+
+    <script>
+        // 定数
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 100; // グリッドの数 (100x100)
+        const cellSize = canvas.width / gridSize; // 各セルのサイズ
+
+        // グリッドと蟻の初期設定
+        let grid;
+        let ant;
+
+        let running = false;
+        let interval;
+
+        // 方向 (0: 上, 1: 右, 2: 下, 3: 左)
+        const directions = [
+            { dx: 0, dy: -1 },
+            { dx: 1, dy: 0 },
+            { dx: 0, dy: 1 },
+            { dx: -1, dy: 0 }
+        ];
+
+        // グリッドと蟻を初期化
+        function initialize() {
+            // グリッドをランダム生成 (0: 白, 1: 黒)
+            grid = Array.from({ length: gridSize }, () => 
+                Array.from({ length: gridSize }, () => Math.random() < 0.5 ? 0 : 1)
+            );
+
+            // 蟻の初期位置と方向をランダム設定
+            ant = {
+                x: Math.floor(Math.random() * gridSize), // ランダムなx座標
+                y: Math.floor(Math.random() * gridSize), // ランダムなy座標
+                dir: Math.floor(Math.random() * 4) // ランダムな方向 (0: 上, 1: 右, 2: 下, 3: 左)
+            };
+
+            drawGrid();
+        }
+
+        // グリッドを描画
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    ctx.fillStyle = grid[y][x] === 1 ? '#000' : '#fff';
+                    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+            }
+            // 蟻を描画
+            ctx.fillStyle = 'red';
+            ctx.fillRect(ant.x * cellSize, ant.y * cellSize, cellSize, cellSize);
+        }
+
+        // 蟻を1ステップ動かす
+        function moveAnt() {
+            // 現在のセルの色を取得
+            const currentCell = grid[ant.y][ant.x];
+
+            // 向きを変更 (白なら右、黒なら左)
+            ant.dir = (ant.dir + (currentCell === 0 ? 1 : -1) + 4) % 4;
+
+            // 現在のセルの色を反転
+            grid[ant.y][ant.x] = currentCell === 0 ? 1 : 0;
+
+            // 蟻を移動
+            ant.x = (ant.x + directions[ant.dir].dx + gridSize) % gridSize;
+            ant.y = (ant.y + directions[ant.dir].dy + gridSize) % gridSize;
+        }
+
+        // スタートボタンのイベント
+        document.getElementById('start-btn').addEventListener('click', () => {
+            if (running) {
+                clearInterval(interval);
+                running = false;
+                document.getElementById('start-btn').textContent = '開始';
+            } else {
+                interval = setInterval(() => {
+                    moveAnt();
+                    drawGrid();
+                }, 50);
+                running = true;
+                document.getElementById('start-btn').textContent = '停止';
+            }
+        });
+
+        // リセットボタンのイベント
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            clearInterval(interval);
+            running = false;
+            document.getElementById('start-btn').textContent = '開始';
+            initialize();
+        });
+
+        // 初期化
+        initialize();
+    </script>
+</body>
+</html>
